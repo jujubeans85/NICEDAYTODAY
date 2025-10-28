@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+httpx
+qrcode
+Pillow
+yt-dlp

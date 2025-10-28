@@ -1,0 +1,45 @@
+{
+  "volume": "bedtime8",
+  "tracks": [
+    {
+      "title": "Teardrop (edit)",
+      "artist": "Massive Attack",
+      "slug": "teardrop"
+    },
+    {
+      "title": "Days to Come (instr.)",
+      "artist": "Bonobo",
+      "slug": "days-to-come"
+    },
+    {
+      "title": "Didn\u2019t Cha Know (night mix)",
+      "artist": "Erykah Badu",
+      "slug": "badunite"
+    },
+    {
+      "title": "Archangel",
+      "artist": "Burial",
+      "slug": "archangel"
+    },
+    {
+      "title": "Silhouettes",
+      "artist": "Floating Points",
+      "slug": "silhouettes"
+    },
+    {
+      "title": "Everything in Its Right Place (live loop)",
+      "artist": "Radiohead",
+      "slug": "eirp"
+    },
+    {
+      "title": "Roads",
+      "artist": "Portishead",
+      "slug": "roads"
+    },
+    {
+      "title": "She Moves She",
+      "artist": "Four Tet",
+      "slug": "she-moves"
+    }
+  ]
+}
