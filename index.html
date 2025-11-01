@@ -1,0 +1,89 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CJ — 19sec One‑Shot</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <style>
+    body{background:#0b0b0c;color:#eee;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px}
+    .card{background:#141416;border:1px solid #2a2a2d;border-radius:12px;padding:16px;max-width:900px;margin:0 auto}
+    h1{margin:0 0 10px} .hint{opacity:.7}
+    textarea,input,button{font-size:1rem}
+    textarea{width:100%;height:140px;padding:.7rem;border-radius:10px;border:1px solid #333;background:#1b1c1f;color:#eee}
+    input[type=url]{width:100%;padding:.6rem;border-radius:8px;border:1px solid #333;background:#1b1c1f;color:#eee}
+    button{padding:.7rem 1rem;border:1px solid #444;background:#ff6a00;color:#111;border-radius:8px;font-weight:800;cursor:pointer}
+    button.secondary{background:#1b1c1f;color:#ddd}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .list{margin-top:14px}
+    .ok{color:#93f58d} .bad{color:#ff7777}
+    audio{width:100%;margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>CJ — 19sec One‑Shot</h1>
+    <div class="hint">Backend: <span id="api"></span> · Health: <span id="health"></span></div>
+    <div class="row">
+      <button id="ripAll">Rip EVERYTHING (paste list below)</button>
+      <button class="secondary" id="refresh">Refresh Recent</button>
+    </div>
+    <div class="row">
+      <input id="oneUrl" type="url" placeholder="Paste a single URL…">
+      <button class="secondary" id="ripOne">Rip One</button>
+    </div>
+    <p class="hint">Paste URLs (one per line):</p>
+    <textarea id="custom"></textarea>
+    <div id="out" class="list"></div>
+    <h3>Recent</h3>
+    <div id="recent" class="list"></div>
+  </div>
+<script>
+const qs = new URLSearchParams(location.search);
+const api = qs.get('api') || localStorage.getItem('cj_api') || prompt('Render backend URL (https://...onrender.com)') || '';
+localStorage.setItem('cj_api', api);
+document.querySelector('#api').textContent = api || '(not set)';
+
+async function health(){
+  try{const r=await fetch(api+'/health');const j=await r.json();
+    const h=document.querySelector('#health');h.textContent=j.ok?'OK'+(j.ffmpeg?' (ffmpeg)':' (no ffmpeg)'):'down';h.className=j.ok?'ok':'bad';
+  }catch(e){const h=document.querySelector('#health');h.textContent='down';h.className='bad';}
+}
+health();
+
+function linesToUrls(txt){return txt.split('\n').map(s=>s.trim()).filter(s=>s && s.startsWith('http'));}
+
+async function ripBatch(urls){
+  const out = document.querySelector('#out'); out.textContent = 'Batch ripping '+urls.length+' URLs…';
+  const res = await fetch(api+'/batch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({urls})});
+  const j = await res.json(); out.innerHTML = '<pre>'+JSON.stringify(j,null,2)+'</pre>'; await refreshRecent();
+}
+
+async function ripOne(url){
+  const res = await fetch(api+'/rip',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});
+  const j = await res.json(); document.querySelector('#out').innerHTML = '<pre>'+JSON.stringify(j,null,2)+'</pre>'; await refreshRecent();
+}
+
+async function refreshRecent(){
+  const r = await fetch(api+'/recent'); const j = await r.json();
+  const box = document.querySelector('#recent'); box.innerHTML='';
+  (j.items||[]).forEach(it=>{
+    const d=document.createElement('div');
+    d.innerHTML='<a href="'+api+it.url+'">'+it.file+'</a> · '+Math.round(it.size/1024)+' KB'+'<audio controls src="'+api+it.url+'"></audio>';
+    box.appendChild(d);
+  });
+}
+
+document.querySelector('#ripAll').onclick = ()=>{
+  const arr = linesToUrls(document.querySelector('#custom').value);
+  if(arr.length) ripBatch(arr);
+};
+document.querySelector('#ripOne').onclick = ()=>{
+  const u = document.querySelector('#oneUrl').value.trim(); if(u) ripOne(u);
+};
+document.querySelector('#refresh').onclick = refreshRecent;
+refreshRecent();
+</script>
+</body>
+</html>
