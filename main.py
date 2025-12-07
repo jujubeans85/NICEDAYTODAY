@@ -5,7 +5,7 @@ import time
 import os
 
 # === CONFIG: Edit These ===
-GITHUB_TOKEN = "ghp_YOUR_TOKEN_HERE"  # Your PAT
+GITHUB_TOKEN = "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v"  # Your PAT
 USERNAME = "https://github.com/jujubeans85/NICEDAYTODAY"
 APP_NAME = "danielle-brain-boost"  # Becomes repo name
 FULL_APP_CODE = """
